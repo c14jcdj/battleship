@@ -69,6 +69,12 @@ class Computer
     @ships = [Ship.new(5), Ship.new(3), Ship.new(4)]
     @board = Board.new
   end
+
+  def get_coor(ship)
+    ship.row = ('a'..'j').to_a.sample
+    ship.col = (1..10).to_a.sample
+    ship.direction = ['h', 'v'].sample
+  end
 end
 
 #VIEW
@@ -114,23 +120,25 @@ class GameController
 
   def run
     view.print_board(player.board)
-    self.place_ships(player.ships, 'human')
+    self.place_ships(player.ships, 'human', player.board)
+    self.place_ships(computer.ships, 'comp', computer.board)
+    view.print_board(computer.board)
   end
 
-  def place_ships(ships,player_type)
+  def place_ships(ships,player_type, board)
     ships.each do |ship|
       check = false
       while check==false
-        view.prompt_user(ship) if player_type == 'human'
-        row = player.board.row_decoder[ship.row.upcase]
+        player_type == 'human' ? view.prompt_user(ship) : computer.get_coor(ship)
+        row = board.row_decoder[ship.row.upcase]
         col = ship.col.to_i
         if ship.direction[0] == "h"
-          if player.board.board[row][col..col+ship.length].include?("*") || col+ship.length > 11
+          if board.board[row][col..col+ship.length].include?("*") || col+ship.length > 11
             puts "Can't place ship here"
             check = false
           else
-            player.board.place_ship(ship)
-            view.print_board(player.board)
+            board.place_ship(ship)
+            view.print_board(board) if player_type == 'human'
             check = true
           end
         else
@@ -139,7 +147,7 @@ class GameController
             vert << "*"
           else
             ship.length.times do
-              vert << player.board.board[row][col]
+              vert << board.board[row][col]
               row +=1
             end
           end
@@ -147,8 +155,8 @@ class GameController
             puts "Can't place ship here"
             check = false
           else
-            player.board.place_ship(ship)
-            view.print_board(player.board)
+            board.place_ship(ship)
+            view.print_board(board) if player_type == 'human'
             check = true
           end
         end
