@@ -91,11 +91,11 @@ end
 
 class GameController
 
-  attr_accessor :view, :board, :player, :computer, :ships
+  attr_accessor :view, :player_board, :player, :computer, :ships
 
   def initialize(arg={})
     @view = arg[:view]
-    @board = arg[:board]
+    @player_board = arg[:player_board]
     @ship1 = arg[:ships][:ship1]
     @ship2 = arg[:ships][:ship2]
     @ship3 = arg[:ships][:ship3]
@@ -105,7 +105,7 @@ class GameController
   end
 
   def run
-    view.print_board(board)
+    view.print_board(player_board)
     self.place_ships(ships)
   end
 
@@ -114,15 +114,15 @@ class GameController
       check = false
       while check==false
         view.prompt_user(ship)
-        row = board.row_decoder[ship.row.upcase]
+        row = player_board.row_decoder[ship.row.upcase]
         col = ship.col.to_i
         if ship.direction[0] == "h"
-          if board.board[row][col..col+ship.length].include?("*") || col+ship.length > 11
+          if player_board.board[row][col..col+ship.length].include?("*") || col+ship.length > 11
             puts "Can't place ship here"
             check = false
           else
-            board.place_ship(ship)
-            view.print_board(board)
+            player_board.place_ship(ship)
+            view.print_board(player_board)
             check = true
           end
         else
@@ -131,7 +131,7 @@ class GameController
             vert << "*"
           else
             ship.length.times do
-              vert << board.board[row][col]
+              vert << player_board.board[row][col]
               row +=1
             end
           end
@@ -139,8 +139,8 @@ class GameController
             puts "Can't place ship here"
             check = false
           else
-            board.place_ship(ship)
-            view.print_board(board)
+            player_board.place_ship(ship)
+            view.print_board(player_board)
             check = true
           end
         end
@@ -151,7 +151,7 @@ class GameController
 end
 
 game = GameController.new({view: View,
-                           board: Board.new,
+                           player_board: Board.new,
                            ships: {ship1: Ship.new(5), ship2: Ship.new(3), ship3: Ship.new(4)},
                            player: Player.new,
                            computer: Computer.new})
