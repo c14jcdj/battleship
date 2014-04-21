@@ -53,9 +53,22 @@ class Ship
 end
 
 class Player
+
+  attr_accessor :board, :ships
+
+  def initialize
+    @ships = [Ship.new(5), Ship.new(3), Ship.new(4)]
+    @board = Board.new
+  end
 end
 
 class Computer
+  attr_accessor :board, :ships
+
+  def initialize
+    @ships = [Ship.new(5), Ship.new(3), Ship.new(4)]
+    @board = Board.new
+  end
 end
 
 #VIEW
@@ -91,22 +104,17 @@ end
 
 class GameController
 
-  attr_accessor :view, :player_board, :player, :computer, :ships
+  attr_accessor :view, :player, :computer
 
   def initialize(arg={})
     @view = arg[:view]
-    @player_board = arg[:player_board]
-    @ship1 = arg[:ships][:ship1]
-    @ship2 = arg[:ships][:ship2]
-    @ship3 = arg[:ships][:ship3]
     @player = arg[:player]
     @computer = arg[:computer]
-    @ships = [@ship1, @ship2,@ship3]
   end
 
   def run
-    view.print_board(player_board)
-    self.place_ships(ships)
+    view.print_board(player.board)
+    self.place_ships(player.ships)
   end
 
   def place_ships(ships)
@@ -114,15 +122,15 @@ class GameController
       check = false
       while check==false
         view.prompt_user(ship)
-        row = player_board.row_decoder[ship.row.upcase]
+        row = player.board.row_decoder[ship.row.upcase]
         col = ship.col.to_i
         if ship.direction[0] == "h"
-          if player_board.board[row][col..col+ship.length].include?("*") || col+ship.length > 11
+          if player.board.board[row][col..col+ship.length].include?("*") || col+ship.length > 11
             puts "Can't place ship here"
             check = false
           else
-            player_board.place_ship(ship)
-            view.print_board(player_board)
+            player.board.place_ship(ship)
+            view.print_board(player.board)
             check = true
           end
         else
@@ -131,7 +139,7 @@ class GameController
             vert << "*"
           else
             ship.length.times do
-              vert << player_board.board[row][col]
+              vert << player.board.board[row][col]
               row +=1
             end
           end
@@ -139,8 +147,8 @@ class GameController
             puts "Can't place ship here"
             check = false
           else
-            player_board.place_ship(ship)
-            view.print_board(player_board)
+            player.board.place_ship(ship)
+            view.print_board(player.board)
             check = true
           end
         end
@@ -151,8 +159,6 @@ class GameController
 end
 
 game = GameController.new({view: View,
-                           player_board: Board.new,
-                           ships: {ship1: Ship.new(5), ship2: Ship.new(3), ship3: Ship.new(4)},
                            player: Player.new,
                            computer: Computer.new})
 
