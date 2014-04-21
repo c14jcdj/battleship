@@ -117,7 +117,7 @@ class GameController
         row = board.row_decoder[ship.row.upcase]
         col = ship.col.to_i
         if ship.direction[0] == "h"
-          if board.board[row][col..col+ship.length].include?("*")
+          if board.board[row][col..col+ship.length].include?("*") || col+ship.length > 11
             puts "Can't place ship here"
             check = false
           else
@@ -127,9 +127,13 @@ class GameController
           end
         else
           vert = []
-          ship.length.times do
-            vert << board.board[row][col]
-            row +=1
+          if row + ship.length > 11
+            vert << "*"
+          else
+            ship.length.times do
+              vert << board.board[row][col]
+              row +=1
+            end
           end
           if vert.include?("*")
             puts "Can't place ship here"
