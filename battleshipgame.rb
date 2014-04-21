@@ -101,7 +101,7 @@ class View
     puts "What direction would you like your ship to go?"
     ship.direction = gets.chomp
     ship.row = square[0]
-    ship.col = square.length == 3 ? square[1..2] : square[1]
+    ship.col = square.length == 3 ? 10 : square[1]
   end
 
   def self.prompt_attack
@@ -132,20 +132,20 @@ class GameController
 
   def attack
     check = false
-    while check == false
+    until check
     view.prompt_attack
     attack = gets.chomp
     row = computer.board.row_decoder[attack[0].upcase]
-    col = attack.length == 3 ? attack[1..2].to_i : attack[1].to_i
+    col = attack.length == 3 ? 10 : attack[1].to_i
     if computer.board.board[row][col] == "*"
       puts "hit"
       computer.board.board[row][col] = "X"
-      p check = check_board(computer.board)
+      check = check_board(computer.board)
       view.print_board(computer.board)
     else
       puts "miss"
       computer.board.board[row][col] = "/"
-      p check = check_board(computer.board)
+      check = check_board(computer.board)
       view.print_board(computer.board)
     end
   end
@@ -184,7 +184,7 @@ class GameController
               row +=1
             end
           end
-          if vert.include?("*")
+          if vert.include?("*") || ship.direction == ""
             puts "Can't place ship here"
             check = false
           else
