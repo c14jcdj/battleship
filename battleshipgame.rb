@@ -104,6 +104,10 @@ class View
     ship.col = square.length == 3 ? square[1..2] : square[1]
   end
 
+  def self.prompt_attack
+    puts "Enter the coordinates of attack"
+  end
+
 end
 
 #CONTROLLER
@@ -120,10 +124,39 @@ class GameController
 
   def run
     view.print_board(player.board)
-    self.place_ships(player.ships, 'human', player.board)
-    self.place_ships(computer.ships, 'comp', computer.board)
+    place_ships(player.ships, 'human', player.board)
+    place_ships(computer.ships, 'comp', computer.board)
     view.print_board(computer.board)
+    attack
   end
+
+  def attack
+    check = false
+    while check == false
+    view.prompt_attack
+    attack = gets.chomp
+    row = computer.board.row_decoder[attack[0].upcase]
+    col = attack.length == 3 ? attack[1..2].to_i : attack[1].to_i
+    if computer.board.board[row][col] == "*"
+      puts "hit"
+      computer.board.board[row][col] = "X"
+      p check = check_board(computer.board)
+      view.print_board(computer.board)
+    else
+      puts "miss"
+      computer.board.board[row][col] = "/"
+      p check = check_board(computer.board)
+      view.print_board(computer.board)
+    end
+  end
+  puts 'You Win!'
+  end
+
+  def check_board(board)
+    !board.board.flatten.include?("*")
+  end
+
+
 
   def place_ships(ships,player_type, board)
     ships.each do |ship|
