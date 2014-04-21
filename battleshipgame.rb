@@ -82,7 +82,7 @@ class View
     puts "What direction would you like your ship to go?"
     ship.direction = gets.chomp
     ship.row = square[0]
-    ship.col = square[1]
+    ship.col = square.length == 3 ? square[1..2] : square[1]
   end
 
 end
