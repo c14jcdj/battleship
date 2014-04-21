@@ -114,14 +114,14 @@ class GameController
 
   def run
     view.print_board(player.board)
-    self.place_ships(player.ships)
+    self.place_ships(player.ships, 'human')
   end
 
-  def place_ships(ships)
+  def place_ships(ships,player_type)
     ships.each do |ship|
       check = false
       while check==false
-        view.prompt_user(ship)
+        view.prompt_user(ship) if player_type == 'human'
         row = player.board.row_decoder[ship.row.upcase]
         col = ship.col.to_i
         if ship.direction[0] == "h"
