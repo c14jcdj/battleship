@@ -107,7 +107,6 @@ class GameController
   def run
     view.print_board(board)
     self.place_ships(ships)
-    view.print_board(board)
   end
 
   def place_ships(ships)
@@ -123,6 +122,7 @@ class GameController
             check = false
           else
             board.place_ship(ship)
+            view.print_board(board)
             check = true
           end
         else
@@ -136,6 +136,7 @@ class GameController
             check = false
           else
             board.place_ship(ship)
+            view.print_board(board)
             check = true
           end
         end
