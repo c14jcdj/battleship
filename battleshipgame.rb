@@ -1,37 +1,47 @@
 #MODELS
-
+require 'debugger'
 class Board
 
-  attr_accessor :board_player, :row_decoder
+  attr_accessor :board, :row_decoder
 
   def initialize
-    @board_player =[[nil,  "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" ],
-                    [  "A",  nil, nil, nil, nil, nil, nil, nil, nil, nil, nil ],
-                    [  "B",  nil, nil, nil, nil, nil, nil, nil, nil, nil, nil ],
-                    [  "C",  nil, nil, nil, nil, nil, nil, nil, nil, nil, nil ],
-                    [  "D",  nil, nil, nil, nil, nil, nil, nil, nil, nil, nil ],
-                    [  "E",  nil, nil, nil, nil, nil, nil, nil, nil, nil, nil ],
-                    [  "F",  nil, nil, nil, nil, nil, nil, nil, nil, nil, nil ],
-                    [  "G",  nil, nil, nil, nil, nil, nil, nil, nil, nil, nil ],
-                    [  "H",  nil, nil, nil, nil, nil, nil, nil, nil, nil, nil ],
-                    [  "I",  nil, nil, nil, nil, nil, nil, nil, nil, nil, nil ],
-                    [  "J", nil, nil, nil, nil, nil, nil, nil, nil, nil, nil ] ]
-   a = (1..10).to_a
-   b = %w(A B C D E F G H I J)
-   @row_decoder =  a.zip(b)
+    @board =[[nil,  "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" ],
+             [  "A",  nil, nil, nil, nil, nil, nil, nil, nil, nil, nil ],
+             [  "B",  nil, nil, nil, nil, nil, nil, nil, nil, nil, nil ],
+             [  "C",  nil, nil, nil, nil, nil, nil, nil, nil, nil, nil ],
+             [  "D",  nil, nil, nil, nil, nil, nil, nil, nil, nil, nil ],
+             [  "E",  nil, nil, nil, nil, nil, nil, nil, nil, nil, nil ],
+             [  "F",  nil, nil, nil, nil, nil, nil, nil, nil, nil, nil ],
+             [  "G",  nil, nil, nil, nil, nil, nil, nil, nil, nil, nil ],
+             [  "H",  nil, nil, nil, nil, nil, nil, nil, nil, nil, nil ],
+             [  "I",  nil, nil, nil, nil, nil, nil, nil, nil, nil, nil ],
+             [  "J", nil, nil, nil, nil, nil, nil, nil, nil, nil, nil ] ]
+    a = (1..10).to_a
+    b = %w(A B C D E F G H I J)
+    @row_decoder =  Hash[b.zip(a)]
   end
 
-  def place_ships(ships)
-      puts row_decoder
-      ships.each do |ship|
+  def place_ship(ship)
+    row = row_decoder[ship.row.upcase]
+    col = ship.col.to_i
+    if ship.direction[0].downcase == "h"
+      ship.length.times do
+        board[row][col] = '*'
+        col += 1
       end
+    else
+      ship.length.times do
+        board[row][col] = '*'
+        row +=1
+      end
+    end
   end
 
 end
 
 class Ship
 
-      attr_accessor :length, :row, :col, :direction
+  attr_accessor :length, :row, :col, :direction
 
   def initialize(length, row=nil, col=nil, direction=nil)
     @length = length
@@ -58,7 +68,7 @@ class View
   end
 
   def self.print_board(board)
-    board.board_player.each do |x|
+    board.board.each do |x|
       x.each do |y|
         print "#{y}\t"
       end
@@ -74,8 +84,6 @@ class View
     ship.row = square[0]
     ship.col = square[1]
   end
-
-
 
 end
 
@@ -98,10 +106,41 @@ class GameController
 
   def run
     view.print_board(board)
+    self.place_ships(ships)
+    view.print_board(board)
+  end
+
+  def place_ships(ships)
     ships.each do |ship|
-      view.prompt_user(ship)
+      check = false
+      while check==false
+        view.prompt_user(ship)
+        row = board.row_decoder[ship.row.upcase]
+        col = ship.col.to_i
+        if ship.direction[0] == "h"
+          if board.board[row][col..col+ship.length].include?("*")
+            puts "Can't place ship here"
+            check = false
+          else
+            board.place_ship(ship)
+            check = true
+          end
+        else
+          vert = []
+          ship.length.times do
+            vert << board.board[row][col]
+            row +=1
+          end
+          if vert.include?("*")
+            puts "Can't place ship here"
+            check = false
+          else
+            board.place_ship(ship)
+            check = true
+          end
+        end
+      end
     end
-    board.place_ships(ships)
   end
 
 end
